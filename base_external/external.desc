@@ -1,0 +1,3 @@
+name: project_base
+# Human-readable description of this external tree.
+desc: Buildroot external tree for AESD assignments

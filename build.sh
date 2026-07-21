@@ -9,6 +9,9 @@ git submodule init
 git submodule sync
 git submodule update
 
+# Clean PATH to remove Windows paths with spaces that break Buildroot
+export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v ' ' | tr '\n' ':' | sed 's/:$//')
+
 set -e 
 cd `dirname $0`
 
@@ -28,6 +31,15 @@ then
 else
 	echo "USING EXISTING BUILDROOT CONFIG"
 	echo "To force update, delete .config or make changes using make menuconfig and build again."
-	make -C buildroot BR2_EXTERNAL=${EXTERNAL_REL_BUILDROOT}
+fi
 
+make -C buildroot BR2_EXTERNAL=${EXTERNAL_REL_BUILDROOT}
+
+# Keep a disk image alias expected by some scripts.
+if [ -e buildroot/output/images/rootfs.ext4 ]
+then
+	ln -sf rootfs.ext4 buildroot/output/images/rootfs.img
+elif [ -e buildroot/output/images/rootfs.ext2 ]
+then
+	ln -sf rootfs.ext2 buildroot/output/images/rootfs.img
 fi
